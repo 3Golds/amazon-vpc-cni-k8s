@@ -207,11 +207,8 @@ func add(args *skel.CmdArgs, cniTypes typeswrapper.CNITYPES, grpcClient grpcwrap
 		if delErr != nil {
 			log.Errorf("Error received from DelNetwork grpc call for container %s: %v",
 				args.ContainerID, delErr)
-		}
-
-		if !r.Success {
-			log.Errorf("Failed to release IP of container %s: %v",
-				args.ContainerID, delErr)
+		} else if !r.Success {
+			log.Errorf("Failed to release IP of container %s", args.ContainerID)
 		}
 		return errors.Wrap(err, "add command: failed to setup network")
 	}
@@ -332,7 +329,6 @@ func del(args *skel.CmdArgs, cniTypes typeswrapper.CNITYPES, grpcClient grpcwrap
 
 func main() {
 	log := logger.DefaultLogger()
-	log.Infof("CNI Plugin version: %s ...", version)
 	about := fmt.Sprintf("AWS CNI %s", version)
 	exitCode := 0
 	if e := skel.PluginMainWithError(cmdAdd, nil, cmdDel, cniSpecVersion.All, about); e != nil {
